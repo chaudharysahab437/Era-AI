@@ -1,0 +1,17 @@
+fastapi>=0.111,<1.0
+uvicorn[standard]>=0.29,<1.0
+pydantic>=2.6,<3.0
+requests>=2.31,<3.0
+mss>=9.0,<10.0
+Pillow>=10.0,<11.0
+numpy>=1.26,<2.0
+psutil>=5.9,<6.0
+
+# Optional (OCR). Requires the separate Tesseract-OCR engine to be
+# installed on Windows and on PATH (or TESSERACT_CMD set) -- see README.
+pytesseract>=0.3.10,<1.0
+
+# Optional (store GEMINI_API_KEY in Windows Credential Manager instead of
+# plaintext .env). Only needed if you use scripts/store_gemini_key.py
+# --store-gemini-key.
+keyring>=24.0,<26.0

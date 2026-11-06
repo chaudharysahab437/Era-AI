@@ -1,8 +1,9 @@
-node_modules/
-build/
-dist/
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+logs/*.log*
+data/exclusions.json
+data/frames/
+.pytest_cache/
