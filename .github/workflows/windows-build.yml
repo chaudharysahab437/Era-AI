@@ -1,0 +1,76 @@
+
+name: ERA-AI Windows EXE Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ERA-AI for Windows
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Latest Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verify Project Files
+        shell: pwsh
+        run: |
+          $required = @(
+            "package.json",
+            "package-lock.json",
+            "electron/main.cjs",
+            "resources/python_runtime",
+            "resources/era_services/era_agent",
+            "resources/era_services/era_bridge",
+            "resources/era_services/era_vision"
+          )
+
+          foreach ($file in $required) {
+            if (!(Test-Path $file)) {
+              throw "Missing required file or folder: $file"
+            }
+            Write-Host "OK: $file"
+          }
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build and Package Windows EXE
+        run: npm run dist
+
+      - name: Verify EXE Files
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem "dist-electron" -Filter "*.exe" -File
+
+          if ($files.Count -eq 0) {
+            throw "No EXE files found!"
+          }
+
+          foreach ($file in $files) {
+            Write-Host "EXE: $($file.Name)"
+            Write-Host "Size: $($file.Length) bytes"
+            Get-FileHash $file.FullName -Algorithm SHA256
+          }
+
+      - name: Upload Windows EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: ERA-AI-Windows-Build
+          path: dist-electron/*.exe
+          if-no-files-found: error
+          retention-days: 14
